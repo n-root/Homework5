@@ -1,0 +1,138 @@
+---
+title: "Homework5"
+format: html
+editor: visual
+---
+
+## Task 1: Conceptual Questions
+
+#### 1. What is the purpose of using cross-validation when fitting a random forest model?
+
+
+
+#### 2. Describe the bagged tree algorithm.
+
+
+
+#### 3. What is meant by a general linear model?
+
+
+
+#### 4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
+
+
+
+#### 5. Why do we split our data into a training and test set?
+
+
+
+## Task 2: Fitting Models
+
+#### Libraries
+
+```{r}
+
+```
+
+
+#### 1. Understand your data
+
+**Check on missingness and summarize the data**
+```{r}
+
+```
+
+
+#### 2. Create a new variable that is a factor version of the HeartDisease variable
+
+```{r}
+
+# Remove the ST_Slope variable and HeartDisease variable
+
+```
+
+#### 3. kNN
+
+```{r}
+# Create dummy columns corresponding to the values of these 3 variables for use in kNN fit
+```
+
+```{r}
+# Use dummyVars() and predict() to create new columns
+```
+
+```{r}
+# Add these columns to our data frame
+```
+
+```{r}
+# Split the data into training and testing sets
+```
+
+```{r}
+# 10 fold cross-validation
+```
+
+
+```{r}
+# use tuneGrid to fit the model
+```
+
+```{r}
+# Check how well the chosen model does on the test set using the confusionMatrix function
+```
+
+#### Logistic Regression
+
+```{r}
+# Posit 3 different logistic regression models
+```
+
+```{r}
+# Fit these models on the training set
+```
+
+**Identify which model is best and summarize it**
+
+```{r}
+# Check how well the chosen model does on the test set using the confusionMatrix() function
+```
+
+
+# Tree Models
+
+```{r}
+# Chose your own variable of interest
+```
+
+
+```{r}
+# Use repeated 10 fold cross-validation
+```
+
+**Classification Tree Model**
+
+```{r}
+
+```
+
+**Random Forest**
+
+```{r}
+
+```
+
+**Boosted Tree**
+
+```{r}
+
+```
+
+
+```{r}
+# Check how well each of the chosen models does on the test set using the confusionMatrix() function
+```
+
+#### Wrap Up
+
+**Which model overall did the best job (in terms of accuracy) on the test set?**
