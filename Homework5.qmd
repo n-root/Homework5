@@ -31,31 +31,76 @@ editor: visual
 #### Libraries
 
 ```{r}
-
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(ggplot2)
+library(httr)
+library(jsonlite)
+library(knitr)
+#library(caret)
 ```
 
 
 #### 1. Understand your data
 
 **Check on missingness and summarize the data**
-```{r}
 
+```{r}
+# Read in the data
+heart_data <- read.csv("heart.csv")
 ```
 
+```{r}
+# Quickly understand the data
+head(heart_data)
+summary(heart_data)
 
-#### 2. Create a new variable that is a factor version of the HeartDisease variable
+# Identify the structure of the data
+str(heart_data)
+```
 
 ```{r}
+# Check for missing values in each row
+num_missing_vals <- sum(is.na(heart_data))
 
+# Print the number of missing values per row
+num_missing_vals
+```
+
+```{r}
+# Summarize the data with respect to the variable relationships to HeartDisease
+heart_data |>
+  group_by(HeartDisease) |>
+  summarise(across(where(is.numeric), list(mean = mean, sd = sd), na.rm = TRUE))
+```
+
+#### 2. Create a new variable
+
+```{r}
+# Create a factor version of the HeartDisease variable
+heart_data <- heart_data |>
+  mutate(HeartDiseaseFactor = as.factor(HeartDisease))
+```
+
+```{r}
 # Remove the ST_Slope variable and HeartDisease variable
-
+heart_data <- heart_data |>
+  select(-ST_Slope, -HeartDisease)
 ```
 
 #### 3. kNN
 
 ```{r}
-# Create dummy columns corresponding to the values of these 3 variables for use in kNN fit
+# Create dummy columns
+dummy_cols <- dummyVars("~ Sex + ExerciseAngina + ChestPainType + RestingECG", data = heart_data)
 ```
+
+```{r}
+# Convert dummy columns to data frames
+```
+
 
 ```{r}
 # Use dummyVars() and predict() to create new columns
