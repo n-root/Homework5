@@ -8,13 +8,28 @@ editor: visual
 
 #### 1. What is the purpose of using cross-validation when fitting a random forest model?
 
+The purpose of using cross-validation when fitting a random forest model is to avoid overfitting and to tune parameters. It allows us to create generalizable random forest models. 
+
+
 #### 2. Describe the bagged tree algorithm.
+
+The bagged tree algorithm is a method that aims to improve the accuracy and robustness of data.
+
 
 #### 3. What is meant by a general linear model?
 
+A general linear model is a model that displays a response variable as a linear combination of predictor variables through the generalization of ordinary least squares regression.
+
+
 #### 4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
 
+Adding an interaction term to a multiple linear regression model allows the model to capture the effect of two or more predictor variables combined. Without adding interaction terms, we will only be able to see the effect of each variable independently in our regression model.
+
+
 #### 5. Why do we split our data into a training and test set?
+
+We split our data into training and testing sets because this ensures that the model is evaluated properly and also able to accurately interact with new data sets.
+
 
 ## Task 2: Fitting Models
 
@@ -28,6 +43,9 @@ library(ggplot2)
 library(httr)
 library(jsonlite)
 library(knitr)
+library(rpart)
+library(randomForest)
+library(gbm, lib.loc="C:/Users/natal/Desktop/R_packages")
 library(caret, lib.loc="C:/Users/natal/Desktop/R_packages")
 ```
 
@@ -218,36 +236,72 @@ confusionMatrix(test_prep3, test_data$HeartDiseaseFactor)
 
 # Tree Models
 
-```{r}
-# Chose your own variable of interest
-```
-
-```{r}
-# Use repeated 10 fold cross-validation
-```
-
 **Classification Tree Model**
 
 ```{r}
+# Define rpart tuning grid
+rpart_grid <- expand.grid(cp = seq(0, 0.1, by = 0.001))
 
+# Fit classification tree model
+rpart_model <- train(HeartDiseaseFactor ~ .,
+                     data = train_data,
+                     method = "rpart",
+                     trControl = ctrl,
+                     tuneGrid = rpart_grid,
+                     metric = "ROC")
 ```
 
 **Random Forest**
 
 ```{r}
+num_predictors <- ncol(train_data) - 1
 
+rf_grid <- expand.grid(mtry = seq(1, num_predictors, by = 1))
+
+rf_model <- train(HeartDiseaseFactor ~ .,
+                  data = train_data,
+                  method = "rf",
+                  trControl = ctrl,
+                  tuneGrid = rf_grid,
+                  metric = "ROC")
 ```
 
 **Boosted Tree**
 
 ```{r}
+gbm_grid <- expand.grid(n.trees = c(25, 50, 100, 200),
+                        interaction.depth = c(1, 2, 3),
+                        shrinkage = 0.1,
+                        n.minobsinnode = 10)
 
+gbm_model <- train(HeartDiseaseFactor ~ .,
+                   data = train_data,
+                   method = "gbm",
+                   trControl = ctrl,
+                   tuneGrid = gbm_grid,
+                   metric = "ROC",
+                   verbose = FALSE)
 ```
 
 ```{r}
+# Compare models
+results <- resamples(list(ClassificationTree = rpart_model,
+                          RandomForest = rf_model,
+                          BoostedTree = gbm_model))
+
+summary(results)
+```
+
+
+```{r}
 # Check how well each of the chosen models does on the test set using the confusionMatrix() function
+test_prep4 <- predict(rf_model, newdata = test_data)
+
+confusionMatrix(test_prep4, test_data$HeartDiseaseFactor)
 ```
 
 #### Wrap Up
 
 **Which model overall did the best job (in terms of accuracy) on the test set?**
+
+Although I am unable to see my models (due to an error that I cannot seem to fix with my factorized HeartDisease variable), I would assume that one of our logistic regression models was the most accurate when it comes to modeling our data. This is because logistic regression models do well with binary classification and, in this instance, the HeartDisease variable is binary. Additionally, it is easy to interpret for most audiences.
