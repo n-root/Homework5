@@ -2,8 +2,4 @@
 project:
   type: website
   output-dir: docs
-=======
-project:
-  type: website
-  output-dir: docs
 >>>>>>> 1d2c2167b4f4a491d0d3ba458169e79dc95c9268
