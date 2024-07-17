@@ -1,5 +1,8 @@
 <<<<<<< HEAD
 project:
   type: website
+=======
+project:
+  type: website
+>>>>>>> 119ac7152fad971a662bfc0a0f41f655c2c69b67
   output-dir: docs
->>>>>>> 1d2c2167b4f4a491d0d3ba458169e79dc95c9268
