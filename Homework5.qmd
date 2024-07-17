@@ -8,30 +8,19 @@ editor: visual
 
 #### 1. What is the purpose of using cross-validation when fitting a random forest model?
 
-
-
 #### 2. Describe the bagged tree algorithm.
-
-
 
 #### 3. What is meant by a general linear model?
 
-
-
 #### 4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?
 
-
-
 #### 5. Why do we split our data into a training and test set?
-
-
 
 ## Task 2: Fitting Models
 
 #### Libraries
 
 ```{r}
-library(tidyverse)
 library(dplyr)
 library(tidyr)
 library(readr)
@@ -39,9 +28,8 @@ library(ggplot2)
 library(httr)
 library(jsonlite)
 library(knitr)
-#library(caret)
+library(caret, lib.loc="C:/Users/natal/Desktop/R_packages")
 ```
-
 
 #### 1. Understand your data
 
@@ -98,58 +86,141 @@ dummy_cols <- dummyVars("~ Sex + ExerciseAngina + ChestPainType + RestingECG", d
 ```
 
 ```{r}
-# Convert dummy columns to data frames
-```
-
-
-```{r}
-# Use dummyVars() and predict() to create new columns
+# Convert the dummy data into a data frame
+dummy_data <- predict(dummy_cols, newdata = heart_data)
+dummy_data <- as.data.frame(dummy_data)
 ```
 
 ```{r}
-# Add these columns to our data frame
+# Add the dummy data frame to our heart data frame and remove categorical variables
+heart_data <- cbind(heart_data, dummy_data)
 ```
 
 ```{r}
+# Set seed for reproducibility
+set.seed(14)
+
+# Create index
+train_index <- createDataPartition(heart_data$HeartDiseaseFactor, p = 0.7, list = FALSE)
+
 # Split the data into training and testing sets
+train_data <- heart_data[train_index, ]
+test_data <- heart_data[-train_index, ]
 ```
 
 ```{r}
-# 10 fold cross-validation
+# Cross validation parameters
+ctrl <- trainControl(method = "repeatedcv",
+                     number = 10,
+                     repeats = 3,
+                     verboseIter = TRUE,
+                     classProbs = TRUE,
+                     summaryFunction = twoClassSummary)
+
+# Preprocess the data by centering and scaling
+preprocess <- preProcess(train_data, method = c("center", "scale"))
+
+# Apply preprocessing to training and testing sets
+train_prep <- predict(preprocess, train_data)
+test_prep <- predict(preprocess, test_data)
 ```
 
-
 ```{r}
-# use tuneGrid to fit the model
+# Create a factor version of the HeartDisease variable for preprocessing data sets
+train_prep <- train_prep |>
+  mutate(HeartDiseaseFactor = as.factor(HeartDiseaseFactor))
+
+test_prep <- test_prep |>
+  mutate(HeartDiseaseFactor = as.factor(HeartDiseaseFactor))
 ```
 
 ```{r}
+train_prep
+```
+
+```{r}
+# Tuning grid
+k_vals <- data.frame(k = seq(1, 40, by = 1))
+
+# Fit kNN model
+knn_model <- train(HeartDiseaseFactor ~ .,
+                   data = train_data,
+                   method = "knn",
+                   trControl = ctrl,
+                   tuneGrid = k_vals)
+```
+
+```{r}
+# Predict on test data
+predictions <- predict(knn_model, newdata = test_data)
+
 # Check how well the chosen model does on the test set using the confusionMatrix function
+confusionMatrix(predictions, test_data$HeartDiseaseFactor)
 ```
 
-#### Logistic Regression
+#### Logistic Regression Models
+
+**Model 1: Basic Logistic Regression**
 
 ```{r}
-# Posit 3 different logistic regression models
+logit_model1 <- train(HeartDiseaseFactor ~ .,
+                      data = train_data,
+                      method = "glm",
+                      trControl = ctrl,
+                      family = "binomial")
+```
+
+**Model 2: Logistic Regression with Preprocessing**
+
+```{r}
+# Preprocess
+preprocess2 <- preProcess(train_data, method = c("center", "scale"))
+
+# Apply preprocessing
+train_prep2 <- predict(preprocess2, train_data)
+
+logit_model2 <- train(HeartDiseaseFactor ~ .,
+                      data = train_prep,
+                      method = "glm",
+                      trControl = ctrl,
+                      family = "binomial")
+```
+
+**Model 3: Logistic Regression with Feature Selection**
+
+```{r}
+logit_model3 <- train(HeartDiseaseFactor ~ .,
+                      data = train_data,
+                      method = "glmStepAIC",
+                      trControl = ctrl,
+                      direction = "both",
+                      family = "binomial")
 ```
 
 ```{r}
-# Fit these models on the training set
-```
+# Identify which model is best and summarize it
+summary(logit_model1$finalModel)
+summary(logit_model2$finalModel)
+summary(logit_model3$finalModel)
 
-**Identify which model is best and summarize it**
+results <- resamples(list(Model1 = logit_model1, Model2 = logit_model2, Model3 = logit_model3))
+
+summary(results)
+```
 
 ```{r}
-# Check how well the chosen model does on the test set using the confusionMatrix() function
-```
+# Make test data predictions (assuming logit_model2 is the best model)
+test_prep3 <- predict(logit_model2, newdata = test_data)
 
+# Confusion matrix
+confusionMatrix(test_prep3, test_data$HeartDiseaseFactor)
+```
 
 # Tree Models
 
 ```{r}
 # Chose your own variable of interest
 ```
-
 
 ```{r}
 # Use repeated 10 fold cross-validation
@@ -172,7 +243,6 @@ dummy_cols <- dummyVars("~ Sex + ExerciseAngina + ChestPainType + RestingECG", d
 ```{r}
 
 ```
-
 
 ```{r}
 # Check how well each of the chosen models does on the test set using the confusionMatrix() function
