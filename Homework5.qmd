@@ -161,19 +161,19 @@ train_prep
 k_vals <- data.frame(k = seq(1, 40, by = 1))
 
 # Fit kNN model
-knn_model <- train(HeartDiseaseFactor ~ .,
-                   data = train_data,
-                   method = "knn",
-                   trControl = ctrl,
-                   tuneGrid = k_vals)
+# knn_model <- train(HeartDiseaseFactor ~ .,
+#                    data = train_data,
+#                    method = "knn",
+#                    trControl = ctrl,
+#                    tuneGrid = k_vals)
 ```
 
 ```{r}
 # Predict on test data
-predictions <- predict(knn_model, newdata = test_data)
+# predictions <- predict(knn_model, newdata = test_data)
 
 # Check how well the chosen model does on the test set using the confusionMatrix function
-confusionMatrix(predictions, test_data$HeartDiseaseFactor)
+#confusionMatrix(predictions, test_data$HeartDiseaseFactor)
 ```
 
 #### Logistic Regression Models
@@ -181,11 +181,11 @@ confusionMatrix(predictions, test_data$HeartDiseaseFactor)
 **Model 1: Basic Logistic Regression**
 
 ```{r}
-logit_model1 <- train(HeartDiseaseFactor ~ .,
-                      data = train_data,
-                      method = "glm",
-                      trControl = ctrl,
-                      family = "binomial")
+# logit_model1 <- train(HeartDiseaseFactor ~ .,
+#                       data = train_data,
+#                       method = "glm",
+#                       trControl = ctrl,
+#                       family = "binomial")
 ```
 
 **Model 2: Logistic Regression with Preprocessing**
@@ -197,41 +197,41 @@ preprocess2 <- preProcess(train_data, method = c("center", "scale"))
 # Apply preprocessing
 train_prep2 <- predict(preprocess2, train_data)
 
-logit_model2 <- train(HeartDiseaseFactor ~ .,
-                      data = train_prep,
-                      method = "glm",
-                      trControl = ctrl,
-                      family = "binomial")
+# logit_model2 <- train(HeartDiseaseFactor ~ .,
+#                       data = train_prep,
+#                       method = "glm",
+#                       trControl = ctrl,
+#                       family = "binomial")
 ```
 
 **Model 3: Logistic Regression with Feature Selection**
 
 ```{r}
-logit_model3 <- train(HeartDiseaseFactor ~ .,
-                      data = train_data,
-                      method = "glmStepAIC",
-                      trControl = ctrl,
-                      direction = "both",
-                      family = "binomial")
+# logit_model3 <- train(HeartDiseaseFactor ~ .,
+#                       data = train_data,
+#                       method = "glmStepAIC",
+#                       trControl = ctrl,
+#                       direction = "both",
+#                       family = "binomial")
 ```
 
 ```{r}
 # Identify which model is best and summarize it
-summary(logit_model1$finalModel)
-summary(logit_model2$finalModel)
-summary(logit_model3$finalModel)
-
-results <- resamples(list(Model1 = logit_model1, Model2 = logit_model2, Model3 = logit_model3))
-
-summary(results)
+# summary(logit_model1$finalModel)
+# summary(logit_model2$finalModel)
+# summary(logit_model3$finalModel)
+# 
+# results <- resamples(list(Model1 = logit_model1, Model2 = logit_model2, Model3 = logit_model3))
+# 
+# summary(results)
 ```
 
 ```{r}
 # Make test data predictions (assuming logit_model2 is the best model)
-test_prep3 <- predict(logit_model2, newdata = test_data)
-
-# Confusion matrix
-confusionMatrix(test_prep3, test_data$HeartDiseaseFactor)
+# test_prep3 <- predict(logit_model2, newdata = test_data)
+# 
+# # Confusion matrix
+# confusionMatrix(test_prep3, test_data$HeartDiseaseFactor)
 ```
 
 # Tree Models
@@ -240,64 +240,64 @@ confusionMatrix(test_prep3, test_data$HeartDiseaseFactor)
 
 ```{r}
 # Define rpart tuning grid
-rpart_grid <- expand.grid(cp = seq(0, 0.1, by = 0.001))
-
-# Fit classification tree model
-rpart_model <- train(HeartDiseaseFactor ~ .,
-                     data = train_data,
-                     method = "rpart",
-                     trControl = ctrl,
-                     tuneGrid = rpart_grid,
-                     metric = "ROC")
+# rpart_grid <- expand.grid(cp = seq(0, 0.1, by = 0.001))
+# 
+# # Fit classification tree model
+# rpart_model <- train(HeartDiseaseFactor ~ .,
+#                      data = train_data,
+#                      method = "rpart",
+#                      trControl = ctrl,
+#                      tuneGrid = rpart_grid,
+#                      metric = "ROC")
 ```
 
 **Random Forest**
 
 ```{r}
-num_predictors <- ncol(train_data) - 1
-
-rf_grid <- expand.grid(mtry = seq(1, num_predictors, by = 1))
-
-rf_model <- train(HeartDiseaseFactor ~ .,
-                  data = train_data,
-                  method = "rf",
-                  trControl = ctrl,
-                  tuneGrid = rf_grid,
-                  metric = "ROC")
+# num_predictors <- ncol(train_data) - 1
+# 
+# rf_grid <- expand.grid(mtry = seq(1, num_predictors, by = 1))
+# 
+# rf_model <- train(HeartDiseaseFactor ~ .,
+#                   data = train_data,
+#                   method = "rf",
+#                   trControl = ctrl,
+#                   tuneGrid = rf_grid,
+#                   metric = "ROC")
 ```
 
 **Boosted Tree**
 
 ```{r}
-gbm_grid <- expand.grid(n.trees = c(25, 50, 100, 200),
-                        interaction.depth = c(1, 2, 3),
-                        shrinkage = 0.1,
-                        n.minobsinnode = 10)
-
-gbm_model <- train(HeartDiseaseFactor ~ .,
-                   data = train_data,
-                   method = "gbm",
-                   trControl = ctrl,
-                   tuneGrid = gbm_grid,
-                   metric = "ROC",
-                   verbose = FALSE)
+# gbm_grid <- expand.grid(n.trees = c(25, 50, 100, 200),
+#                         interaction.depth = c(1, 2, 3),
+#                         shrinkage = 0.1,
+#                         n.minobsinnode = 10)
+# 
+# gbm_model <- train(HeartDiseaseFactor ~ .,
+#                    data = train_data,
+#                    method = "gbm",
+#                    trControl = ctrl,
+#                    tuneGrid = gbm_grid,
+#                    metric = "ROC",
+#                    verbose = FALSE)
 ```
 
 ```{r}
 # Compare models
-results <- resamples(list(ClassificationTree = rpart_model,
-                          RandomForest = rf_model,
-                          BoostedTree = gbm_model))
-
-summary(results)
+# results <- resamples(list(ClassificationTree = rpart_model,
+#                           RandomForest = rf_model,
+#                           BoostedTree = gbm_model))
+# 
+# summary(results)
 ```
 
 
 ```{r}
 # Check how well each of the chosen models does on the test set using the confusionMatrix() function
-test_prep4 <- predict(rf_model, newdata = test_data)
-
-confusionMatrix(test_prep4, test_data$HeartDiseaseFactor)
+# test_prep4 <- predict(rf_model, newdata = test_data)
+# 
+# confusionMatrix(test_prep4, test_data$HeartDiseaseFactor)
 ```
 
 #### Wrap Up
