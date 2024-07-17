@@ -44,7 +44,7 @@ library(httr)
 library(jsonlite)
 library(knitr)
 library(rpart)
-library(randomForest)
+library(randomForest, lib.loc="C:/Users/natal/Desktop/R_packages")
 library(gbm, lib.loc="C:/Users/natal/Desktop/R_packages")
 library(caret, lib.loc="C:/Users/natal/Desktop/R_packages")
 ```
